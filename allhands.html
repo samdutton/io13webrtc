@@ -1,0 +1,652 @@
+<!--
+Google IO 2012/2013 HTML5 Slide Template
+
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahé <lukem@google.com>
+
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" media="all" href="theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+</head>
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+<slide class="logoslide nobackground">
+  <article class="flexbox vcenter">
+    <span><img src="images/google_developers_logo.png"></span>
+  </article>
+</slide>
+
+<slide class="title-slide segue nobackground">
+  <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+  <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+  <hgroup class="auto-fadein">
+    <h1 data-config-title><!-- populated from slide_config.json --></h1>
+    <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+    <p data-config-presenter><!-- populated from slide_config.json --></p>
+  </hgroup>
+  <aside class="note">
+      <ul>
+        <p>What is WebRTC?</p>
+        <li>No licenses or other fees</li>
+        <li>Open source</li>
+        <li>Standardized APIs</li>
+        <li>No plugins</li>
+      </ul>
+  </aside>
+</slide>
+
+<slide class="segue dark quote nobackground">
+  <aside class="gdbar right bottom"><img src="images/google_developers_icon_128.png"></aside>
+  <article class="flexbox vleft auto-fadein">
+    <q>
+      WebRTC is a new front in the long war for an open and unencumbered web
+    </q>
+    <div class="author">
+      Brendan Eich<br>
+      &ndash; Mozilla CTO and inventor of JavaScript
+    </div>
+  </article>
+  <aside class="note">
+    <ul>
+      <li>Three billion WebRTC users by 2016 -- according to easyRTC</li>
+    </ul>
+  </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div>Low cost, high quality audio and video communication</div>
+    </article>
+    <aside class="note">
+      <p>For the first time, we will start seeing person to person communication not as separate apps, but as a seamless part of your web experience. </p>
+    </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div class="big">...and data!</div>
+    </article>
+    <aside class="note">
+      <p>Low latency communication between peers, with less hops.</p>
+    </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>Since last year? A lot!</h2>
+  </hgroup>
+  <article>
+    <ul>
+      <li>Interop: Firefox</li>
+      <li>Mobile: Chrome Android</li>
+      <li>New APIs: screensharing, RTCDataChannel, Web Audio</li>
+      <li>Emergence of middleware: JS libraries, SaaS, etc.</li>
+      <li>Apps and platforms</li>
+    </ul>
+  </article>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>Support?</h2>
+  </hgroup>
+  <article>
+    <ul>
+      <li>Google Chrome desktop: full support in Stable, flagless</li>
+      <li>Google Chrome Android Beta: behind a flag</li>
+      <li>Opera: getUserMedia, moving to WebKit</li>
+      <li>Firefox:
+        <ul class="tight">
+        <li>Nightly and Aurora</li>
+          <li>Firefox for Android: getUserMedia in experimental builds</li>
+          <li><a href="http://www.webrtc.org/interop" title="Firefox/Chrome interop documentation">interop notes</a></li>
+        </ul>
+      </li>
+      <li>IE: full WebRTC support now <a href="http://samdutton.wordpress.com/2012/08/09/how-to-use-webrtc-in-internet-explorer-with-chrome-frame/" title="Blog post about apprtc demo running in Chrome Frame">via Chrome Frame</a></li>
+    </ul>
+  </article>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>APIs</h2>
+  </hgroup>
+  <article>
+  <ul>
+    <li>MediaStream (aka getUserMedia)</li>
+    <li>RTCPeerConnection</li>
+    <li>RTCDataChannel</li>
+  </ul>
+  </article>
+  <aside class="note">
+    <p>MediaStream: access to data streams, not just the user's camera and microphone.</p>
+    <p>A lot of news stories refer to WebRTC when they actually just mean getUserMedia.</p>
+    <p>Shim: <a href="https://github.com/addyosmani/getUserMedia.js/tree/master/lib" title="getUserMedia.js shim on github">getUserMedia.js</a> from Addy Osmani.</p>
+    <p>RTCPeerConnection: audio or video calling, with facilities for encryption, bandwidth management and so on. Currently one-to-one -- but could be one to many.</p>
+    <p>RTCDataChannel: high performance peer-to-peer communication of generic data.  (I heard a WebRTC engineer saying that with WebSocket you can hope for maybe 50ms round-trip times. DataChannel aims to have little more than a 'speed of light' problem, so latency is coming down to physical limits.)</p>
+  </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>Two types of data</h2>
+  </hgroup>
+  <article>
+  <ul>
+    <li>Media: audio and/or video</li>
+    <li>Arbitrary data: game positions, sensor data...</li>
+  </ul>
+  </article>
+  <aside class="note">
+  </aside>
+</slide>
+
+
+<slide>
+  <hgroup>
+    <h2>Get, communicate, render</h2>
+  </hgroup>
+  <article>
+  <p>Input: </p>
+  <ul>
+    <li>Media Stream from getUserMedia (or stream from disk)<br />
+    </li>
+    <li>Arbitrary data passed to RTCDataChannel</li>
+  </ul>
+
+  <p style="margin: 2em 0 2em 0; font-weight: bold">Pipe through RTCPeerConnection...</p>
+
+  <p>Output: </p>
+  <ul>
+    <li>Render Media Stream in a video or audio element</li>
+    <li>Handle arbitrary data from RTCDataChannel</li>
+  </ul>
+  </article>
+  <aside class="note">
+  </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>Communicate Media Streams</h2>
+  </hgroup>
+  <article class="fill flexbox vcenter">
+    <div>
+      <img style="float: left; width: 27%;" src="images/caller.jpg" alt="WebRTC video chat: caller" />
+      <div style="float: left; line-height: 2em; margin: 0 2em 0 2em; text-align: center;">
+      →<br />
+      getUserMedia<br />
+      +<br />
+      RTCPeerConnection<br />
+      ←
+      </div>
+      <img  style="float: left; position: relative; top: 38px; width: 35%;" src="images/callee.jpg" alt="WebRTC video chat: callee" />
+    </div>
+  </article>
+  <aside class="note">
+  </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>Communicate arbitrary data</h2>
+  </hgroup>
+  <article class="fill flexbox vcenter">
+  <div>
+
+  <div style="float: left; width: 28%;">
+    <img style="display: block; margin: 0 0 0.5em 0; position: relative; width: 100%;" src="images/jankInvadersScreenshot.jpg" alt="Game: caller" />
+    <div style="background: #eee; font-family: 'Source Code Pro', 'Courier New', monospace; font-size: 0.5em; line-height: 1.2em; padding: 1em; white-space: pre;">onreceivemessage = handle(data);
+...
+var myData = [
+  {
+    id: "ship1";
+    x: 24,
+    y: 11,
+    velocity: 7
+  },
+  ....
+]
+send(myData);
+</div>
+      </div>
+      <div style="float: left; line-height: 2em; margin: 0 2em 0 2em; position: relative; text-align: center; top: 4em; width: 25%;">
+      →<br />
+      RTCDataChannel<br />
+      +<br />
+      RTCPeerConnection<br />
+      ←
+      </div>
+
+      <div style="float: left; width: 28%;">
+        <div style="background: #eee; font-family: 'Source Code Pro', 'Courier New', monospace; font-size: 0.5em; line-height: 1.2em; margin: 0 0 1em 0; padding: 1em; white-space: pre;">onreceivemessage = handle(data);
+...
+var myData = [
+  {
+    id: "ship7";
+    x: 19,
+    y: 4,
+    velocity: 18
+  },
+  ....
+]
+send(myData);
+</div>
+        <img style="display: block; width: 100%;" src="images/jankInvadersScreenshotReversed.jpg" alt="Game: callee" />
+      </div>
+
+  </div>
+  </article>
+  <aside class="note">
+  </aside>
+</slide>
+
+<slide class="nobackground">
+  <hgroup>
+    <h2>Multiple inputs</h2>
+  </hgroup>
+  <article class="fill flexbox vcenter">
+
+  <div id='multipleInputs'>
+  <img id='nexusInput' src="images/nexus10.png" alt="Nexus 10" />
+  <div>
+  Microphone<br />
+  →<br />
+  Front camera<br />
+  →<br />
+  Rear camera<br />
+  →<br />
+  App sharing video<br />
+  →<br />
+  <br />
+  Webcam video<br />
+  ←<br />
+  Stereo audio<br />
+  ←
+  </div>
+  <img id='pixelInput' src="images/pixel.jpg" alt="Chromebook Pixel" />
+  </div>
+
+  </article>
+  <aside class="note">
+    <p>Chrome, Firefox, Opera, Chrome and Firefox on Android.</p>
+  </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div><a href="http://idevelop.github.com/ascii-camera/" title="getUserMedia video rendered as ASCII art">idevelop.github.com/ascii-camera</a></div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div><a href="http://lli.web.fh-koeln.de/mocowe" title="getUserMedia used to control a slide deck">lli.web.fh-koeln.de/mocowe</a></div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div><a href="http://www.shinydemos.com/facekat/" title="getUserMedia used to control a game">FaceKat</a></div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div><a href="http://webcamtoy.com/" title="getUserMedia photobooth, with effects">webcamtoy.com</a></div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div><a href="http://www.soundstep.com/blog/experiments/jsdetection/" title="getUserMedia xylophone">soundstep.com/blog/experiments/jsdetection</a></div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div style='margin: 0 0 2em 0'><a href="https://html5-demos.appspot.com/static/getusermedia/screenshare.html" title="Screen sharing demo">Screen sharing</a></div>
+      <div><a href="http://updates.html5rocks.com/2012/12/Screensharing-with-WebRTC" title="HTML5 Rocks update demoing tab capture">Tab capture: chrome.tabCapture</a></div>
+    </article>
+    <aside class="note">
+    <p>Extremely useful for doing IT support for your extended family!</p>
+    </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div><a href="http://www.webaudiodemos.appspot.com/input/index.html" title="Web Audio effects demo">webaudiodemos.appspot.com/input</a></div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+ <slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div><a href="http://www.webaudiodemos.appspot.com/AudioRecorder/index.html" title="Record audio">webaudiodemos.appspot.com/AudioRecorder</a></div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>gUM ☞ Web Audio ☞ RTCPeerConnection</h2>
+  </hgroup>
+  <article>
+  <p style="margin: 0 0 2em 0">Capture microphone input and stream it to a peer with processing applied:</p>
+    <pre class="prettyprint" data-lang="javascript">
+navigator.getUserMedia('audio', gotAudio);
+function gotAudio(stream) {
+  var microphone = context.createMediaStreamSource(stream);
+  var filter = context.createBiquadFilter();
+  var peer = context.createMediaStreamDestination();
+  microphone.connect(filter);
+  filter.connect(peer);
+  peerConnection.addStream(peer.stream);
+}
+</pre>
+
+  <p style="margin: 2em 0 0 0"><a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/webrtc-integration.html" title="W3C examples adapted from the MediaStream Processing API proposal">More Media Stream integration examples</a></p>
+
+  </article>
+  <aside class="note">
+    <p>Already in experimental builds and working well.</p>
+    <p>This is very powerful: effects into and out of RTCPeerConnection.</p>
+    <p>'Join the boxes' architecture.</p>
+  </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>gUM screencapture ☞ RTCPeerConnection</h2>
+  </hgroup>
+  <article>
+  <p style="margin: 0 0 2em 0">Capture microphone input and stream it to a peer with processing applied:</p>
+    <pre class="prettyprint" data-lang="javascript">
+navigator.webkitGetUserMedia(
+  {
+    video: {
+      mandatory: {
+        chromeMediaSource: 'screen'
+      }
+    }
+  },
+  gotStream, function(e){console.log("getUserMedia error: ", e);}
+);</pre>
+<a href="https://simpl.info/screencapture/" title="Screen capture–RTCPeerConnection demo">simpl.info/screencapture</a>
+  </article>
+  <aside class="note">
+    <p</p>
+  </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>Tethr</h2>
+  </hgroup>
+  <article class="flexbox vcenter">
+    <a href="http://tethr.tumblr.com" title="WebRTC API documentation"><img style="height: 100%" src="images/tethr.jpg" alt="Tethr in action at Google I/O 2012" /></a>
+  </article>
+    <aside class="note">
+      <p>At Google I/O last year Voxeo demonstrated a framework for disaster communications:</p>
+      <p>Set up an OpenBTS cell to enable communications between feature phones and computers via WebRTC.</p>
+      <p>Telephone communication without a carrier!</p>
+    </aside>
+</slide>
+
+<slide class="segue dark nobackground">
+  <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+  <hgroup class="auto-fadein">
+    <h2>RTCDataChannel</h2>
+    <h3>Bidirectional communication of arbitrary data between peers</h3>
+  </hgroup>
+  <aside class="note">
+    <p></p>
+  </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>RTCDataChannel</h2>
+  </hgroup>
+  <article>
+    <ul>
+      <li>API like WebSocket</li>
+      <li>Ultra-low latency</li>
+      <li>Unreliable v reliable: game position v file sharing</li>
+      <li>Gaming, remote control, sensor data...</li>
+    </ul>
+  </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>RTCDataChannel</h2>
+  </hgroup>
+  <article>
+<pre class="prettyprint" data-lang="javascript">
+function sendData(){
+  var data = document.getElementById("dataChannelSend").value;
+  sendChannel.send(data);
+}
+pc1 = new webkitRTCPeerConnection(servers, {optional: [{RtpDataChannels: true}]});
+sendChannel = pc1.createDataChannel("sendDataChannel", {reliable: false});
+...
+pc2 = new webkitRTCPeerConnection(servers, {optional: [{RtpDataChannels: true}]});
+function receiveChannelCallback(event) {
+  receiveChannel = event.channel;
+  receiveChannel.onmessage = onReceiveMessageCallback;
+}
+pc2.ondatachannel = receiveChannelCallback;
+function onReceiveMessageCallback(event) {
+  document.getElementById("dataChannelReceive").value = event.data;
+}
+</pre>
+  </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="nobackground">
+  <article class="fill flexbox vcenter">
+    <a class="big" href="http://www.sharefest.me/" title="Sharefest app">Sharefest</a>
+  </article>
+  <aside class="note">
+  </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div class="big">chrome://webrtc-internals</div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div class="big"><a href="https://code.google.com/p/webrtc-samples/source/browse/trunk/apprtc/js/adapter.js" title="adapter.js WebRTC shim">adapter.js</a></div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="nobackground red">
+    <article class="fill flexbox vcenter">
+      <div class="big">This is doing my head in.</div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>Libs, apps and frameworks to the rescue!</h2>
+  </hgroup>
+  <article>
+    <ul>
+      <li><a href="https://github.com/priologic/easyrtc" title="easyRTC github repository">easyRTC</a></li>
+      <li><a href="http://conversat.io/" title="conversat.io video chat app">conversat.io</a> built with <a href="https://github.com/henrikjoreteg/SimpleWebRTC" title="SimpleWebRTC github repository">SimpleWebRTC</a></li>
+      <li><a href="http://peerjs.com/" title="PeerJS site">PeerJS</a></li>
+      <li><a href="https://github.com/webRTC/webRTC.io" title="webRTC.io github repository">webRTC.io</a></li>
+      <li><a href="https://github.com/peer5/sharefest" title="Sharefest github repository">Sharefest</a></li>
+    </ul>
+    <p style='margin: 2em 0 0 0'>Please tell me if I missed something!</p>
+  </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div class="big"><a href="https://www.conversat.io/io" title="conversat.io video chat demo">conversat.io/chrome</a></div>
+    </article>
+    <aside class="note">
+      <p>Demo with the audience</p>
+    </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>The project</h2>
+  </hgroup>
+  <article>
+  <ul>
+    <li><a href="webrtc.org" title="WebRTC project website">webrtc.org</a></li>
+    <li><a href="https://groups.google.com/forum/?fromgroups#!forum/discuss-webrtc" title="WebRTC discussion group">discuss-webrtc</a></li>
+    <li><a href="https://twitter.com/webrtc" title="WebRTC on Twitter">@webrtc</a></li>
+    <li><a href="https://plus.sandbox.google.com/113817074606039822053/posts" title="WebRTC on Google+">+webrtc</a></li>
+  </ul>
+  </article>
+<aside class="note">
+    <p>webrtc.org has a blog, links to demos, documentation and links to code repositories</p>
+    <p>...and follow Justin Uberti and Serge Lachapelle on Google+</p>
+  </aside>
+</slide>
+
+<slide>
+  <hgroup>
+    <h2>Documentation</h2>
+  </hgroup>
+  <article>
+  <ul>
+    <li>Justin Uberti: <a href="http://www.youtube.com/watch?v=E8C8ouiXHHk" title="Video of Google I/O 2012 presentation">Google I/O presentation video</a></li>
+    <li>Cullen Jennings video: <a href="http://vimeo.com/47682405" title="IETF and W3C standardisation discussion">HTML5 WebRTC</a></li>
+    <li>HTML5 Rocks:</li>
+    <ul>
+      <li><a href="http://www.html5rocks.com/en/tutorials/getusermedia/intro/" title="HTML5 Rocks article about getUserMedia">Capturing audio and video in HTML5</a></li>
+      <li><a href="http://www.html5rocks.com/en/tutorials/webrtc/basics/" title="HTML5 Rocks article about WebRTC">Getting Started With WebRTC</a></li>
+      <li><a href="http://www.html5rocks.com/en/search?q=webrtc" title="HTML5 content tagged WebRTC">Updates</a></li>
+    </ul>
+    <li>...and a book: <a href="http://www.webrtcbook.com" title="WebRTC ebook download">webrtcbook.com</a></li>
+  </ul>
+  </article>
+<aside class="note">
+    <p></p>
+  </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div class="bigger"><a href="http://www.crbug.com/new" title="Report Chrome bugs and feature requests">crbug.com/new</a></div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="segue dark quote nobackground">
+  <aside class="gdbar right bottom"><img src="images/google_developers_icon_128.png"></aside>
+  <article class="flexbox vleft auto-fadein">
+    <q>WebRTC and HTML5 could enable the same transformation for real-time communications that the original browser did for information.</q>
+    <div class="author">
+      Phil Edholm<br>
+      &mdash; NoJitter
+    </div>
+  </article>
+  <aside class="note">
+    <section>
+      <ul>
+        <li>What JavaScript developers make of WebRTC.</li>
+        <li>Companies like Jive, Twilio and Voxeo are web-centric, not VOIP companies.</li>
+        <li>A major priority at Google.</li>
+        <li>For the first time, we will start seeing person to person communication not as separate apps, but as a seamless part of your web experience. </li>
+      </ul>
+    </section>
+  </aside>
+</slide>
+
+<slide class="nobackground">
+    <article class="fill flexbox vcenter">
+      <div class="big"><a href="http://webrtc2013.appspot.com" title="These slides online">webrtc2013.appspot.com</a></div>
+    </article>
+    <aside class="note">
+    </aside>
+</slide>
+
+<slide class="thank-you-slide segue nobackground">
+  <aside class="gdbar right"><img src="images/google_developers_icon_128.png"></aside>
+  <article class="flexbox vleft auto-fadein">
+    <h2>&lt;Thank You!&gt;</h2>
+  </article>
+  <p class="auto-fadein" data-config-contact>
+    <!-- populated from slide_config.json -->
+  </p>
+</slide>
+
+<slide class="logoslide dark nobackground">
+  <article class="flexbox vcenter">
+    <span><img src="images/google_developers_logo_white.png"></span>
+  </article>
+</slide>
+
+<slide class="backdrop"></slide>
+
+</slides>
+
+<script>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-XXXXXXXX-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+</body>
+</html>
