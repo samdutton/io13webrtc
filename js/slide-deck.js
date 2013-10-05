@@ -207,6 +207,7 @@ SlideDeck.prototype.onBodyKeyDown_ = function(e) {
     // added by dutton@
     case 70: // F: Toggle display of find dialog, but not if focus is in <input>, etc.
       if (e.target === document.body && !e.metaKey && !e.ctrlKey) {
+        matches = []; // init the list of matches
         if (findDiv.classList.contains('shown')) {
           findDiv.classList.remove('shown');
         } else {
@@ -527,6 +528,39 @@ SlideDeck.prototype.nextSlide = function(opt_dontPush) {
     this.updateSlides_(opt_dontPush);
   }
 };
+
+// added by dutton@
+SlideDeck.prototype.setCurrentSlide = function(slideIndex, opt_dontPush) {
+  if (!document.body.classList.contains('overview') && this.buildNextItem_()) {
+    return;
+  }
+
+  if (this.slides.length > slideIndex) {
+    var bodyClassList = document.body.classList;
+    bodyClassList.remove('highlight-code');
+
+    // Toggle off speaker notes if they're showing when we advanced on the main
+    // slides. If we're the speaker notes popup, leave them up.
+    if (this.controller && !this.controller.isPopup) {
+      bodyClassList.remove('with-notes');
+    } else if (!this.controller) {
+      bodyClassList.remove('with-notes');
+    }
+
+    this.curSlide_ = slideIndex;
+    this.prevSlide_ = slideIndex - 1;
+
+    this.updateSlides_(opt_dontPush);
+  }
+};
+
+window.onhashchange = function(){
+  console.log('hashchange');
+  var slideIndex = location.hash.split('#')[1] - 1;
+  if (slideIndex >= 0 && slideIndex < slides.length) {
+    slidedeck.setCurrentSlide(slideIndex);
+  }
+}
 
 /* Slide events */
 

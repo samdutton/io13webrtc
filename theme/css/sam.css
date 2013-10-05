@@ -75,7 +75,7 @@ div#find {
 }
 
 div#find.shown {
-  display: block;
+  display: block !important;
 }
 
 h2 {

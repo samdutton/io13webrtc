@@ -1,6 +1,10 @@
 // add autocomplete
+// match find box and behaviour
+// datalist using var words = document.body.textContent.split(/\s+/).sort().filter( function(v,i,o){return v!==o[i-1];});
+// h3manth.com/content/javascript-one-liner-extracting-unique-words-webpages
 
-// edited index.html (for elements), sam.css (for find elements), slides.js (to add find.js), slide-deck.js (to add case)
+
+// edited index.html (for elements), sam.css (for find elements), slides.js (to add find.js), slide-deck.js (add case for F; setCurrentSlide())
 
 var currentMatchIndex = 0;
 var matches = [];
@@ -11,48 +15,7 @@ var findButton = document.querySelector('div#find button');
 var findDiv = document.querySelector('div#find');
 var findInput = document.querySelector('div#find input');
 
-// handle click if in findDiv, otherwise hide findDiv
-document.body.onclick = function(e){
-  console.log(e.target);
-  if (findDiv.contains(e.target)) {
-    e.preventDefault();
-  } else {
-    findDiv.classList.remove('shown');
-  }
-}
-
-findInput.onkeydown = function(e){
-  if (e.keyCode === 13) {
-    find();
-  }
-}
-
-findButton.onclick = find();
-
-function find(){
-  queryString = findInput.value.replace(/[^a-zA-Z()_.=<>]/g, " ").toLowerCase();
-  numResults = 0;
-  numSlides = 0;
-  searchResultsString = '';
-  console.time('Time for search:');
-  for (var i = 0; i !== slides.length; ++i) {
-    matches = [];
-    if (slides[i].text.indexOf(queryString) !== -1) {
-      console.log(slides[i].text);
-      matches.push(i +1); // slides[0] corresponds to slide #1
-    }
-  }
-  if (matches.length > 0) {
-    displayNextMatch();
-  }
-};
-
-function displayMatch(){
-  // !!!hack
-  location.hash = '#' + (matches[currentMatchIndex]);
-  currentMatchIndex = (currentMatchIndex + 1) % matches.length;
-//  location.reload();
-}
+getSlideData();
 
 function getSlideData(){
   // cope with different document formats
@@ -66,11 +29,11 @@ function getSlideData(){
   for (var i = 0; i !== slideElements.length; ++i){
     addSlideData(slideElements[i]);
   }
+  // console.log('slides', slides.length, slides);
 }
 
 // each slide may have a heading, article, aside (speaker notes) and images
 function addSlideData(slideElement){
-
   var slide = {
     text: ''
   };
@@ -89,19 +52,22 @@ function addSlideData(slideElement){
     // if h3, add it
     slide.heading = slide.heading.length > 0 ? slide.heading + ' · ' + getText(h3) : getText(h2);
   }
-  slide.text += slide.heading;
+
+  if (slide.heading) {
+    slide.text += slide.heading;
+  }
 
   var article = slideElement.querySelector('article');
   if (article && article.textContent.trim() !== ''){
     slide.article = getText(article);
+    slide.text += slide.article;
   }
-  slide.text += slide.article;
 
   var aside = slideElement.querySelector('aside');
   if (aside && aside.textContent.trim() !== ''){
     slide.aside = getText(aside);
+    slide.text += slide.aside;
   }
-  slide.text += slide.aside;
 
   var images = slideElement.querySelectorAll('img');
   if (images.length){
@@ -120,13 +86,62 @@ function addSlideData(slideElement){
     }
   }
 
-  // combine and lowercase text to enable faster search
-  slide.text = slide.text.toLowerCase();
   slides.push(slide);
 }
 
 
 
 function getText(element){
-  return element.textContent.trim().replace(/\s+/g, ' ');
+  return element.textContent.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+// handle click if in findDiv, otherwise hide findDiv
+document.body.onclick = function(e){
+  if (findDiv.contains(e.target)) {
+    e.preventDefault();
+  } else {
+    findDiv.classList.remove('shown');
+  }
+}
+
+findInput.onkeydown = function(e){
+  matches = [];
+  if (e.keyCode === 13) {
+    find();
+  }
+}
+
+findButton.onclick = find;
+
+function find(){
+  console.log('find() matches', matches);
+  if (matches.length === 0) {
+    queryString = findInput.value.replace(/[^a-zA-Z()_.=<>]/g, " ").toLowerCase();
+    numResults = 0;
+    numSlides = 0;
+    searchResultsString = '';
+    console.time('Time for search:');
+    for (var i = 0; i !== slides.length; ++i) {
+      if (slides[i].text.indexOf(queryString) !== -1) {
+        console.log('matched slide ', i, slides[i].text);
+        matches.push(i);
+      }
+    }
+  }
+  if (matches.length > 0) {
+    console.log('matches: ', matches);
+    displayNextMatch();
+  }
+};
+
+function displayNextMatch(){
+  var slideIndex = matches[currentMatchIndex];
+  slidedeck.setCurrentSlide(slideIndex);
+  var aside = slides[slideIndex].aside;
+  if (aside && aside.indexOf(queryString) > 0) {
+    console.log(aside);
+    document.body.classList.add('with-notes');
+  }
+
+  currentMatchIndex = (currentMatchIndex + 1) % matches.length;
 }
