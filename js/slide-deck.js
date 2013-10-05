@@ -213,22 +213,10 @@ SlideDeck.prototype.onBodyKeyDown_ = function(e) {
         } else {
           findDiv.classList.add('shown');
           findInput.focus();
+          findInput.select();
           if (slides.length === 0) {
             getSlideData();
           }
-        }
-        e.preventDefault();
-      }
-      break;
-
-    // added by dutton@
-    case 71: // F: Show find dialog, but not if focus is in <input>, etc.
-      if (e.target === document.body && !e.metaKey && !e.ctrlKey) {
-        if (findDiv.className !== 'shown') {
-          findDiv.className = 'shown';
-          findInput.focus();
-        } else {
-          findDiv.className = '';
         }
         e.preventDefault();
       }

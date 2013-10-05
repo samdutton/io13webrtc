@@ -114,22 +114,18 @@ findInput.onkeydown = function(e){
 findButton.onclick = find;
 
 function find(){
-  console.log('find() matches', matches);
   if (matches.length === 0) {
     queryString = findInput.value.replace(/[^a-zA-Z()_.=<>]/g, " ").toLowerCase();
     numResults = 0;
     numSlides = 0;
     searchResultsString = '';
-    console.time('Time for search:');
     for (var i = 0; i !== slides.length; ++i) {
       if (slides[i].text.indexOf(queryString) !== -1) {
-        console.log('matched slide ', i, slides[i].text);
         matches.push(i);
       }
     }
   }
   if (matches.length > 0) {
-    console.log('matches: ', matches);
     displayNextMatch();
   }
 };
@@ -138,10 +134,21 @@ function displayNextMatch(){
   var slideIndex = matches[currentMatchIndex];
   slidedeck.setCurrentSlide(slideIndex);
   var aside = slides[slideIndex].aside;
-  if (aside && aside.indexOf(queryString) > 0) {
-    console.log(aside);
+  console.log('aside', aside);
+  if (aside && aside.indexOf(queryString) !== -1) {
+    console.log('show aside');
     document.body.classList.add('with-notes');
   }
-
   currentMatchIndex = (currentMatchIndex + 1) % matches.length;
+  highlight(queryString);
+}
+
+function highlight(text){
+  console.log('highlighting ', text);
+  var slides = document.getElementsByTagName('slide');
+  for (var i = 0; i != slides.length; ++i) {
+    var re = new RegExp('(' + text + ')', 'gi');
+    slides[i].innerHTML =
+      slides[i].innerHTML.replace(re, '<mark>\$1</mark>');
+  }
 }
