@@ -10,6 +10,7 @@ var currentMatchIndex = 0;
 var matches = [];
 var slides = [];
 var queryString;
+var slideElements;
 
 var findButton = document.querySelector('div#find button');
 var findDiv = document.querySelector('div#find');
@@ -21,7 +22,7 @@ function getSlideData(){
   // cope with different document formats
   // Chrome Dev Rel presentations have article elements in slide elements
   var d =  window.document;
-  var slideElements = d.querySelectorAll('slide') || d.querySelector('article') || d.querySelector('section');
+  slideElements = d.querySelectorAll('slide') || d.querySelector('article') || d.querySelector('section');
   if (!slideElements) {
     console.log('Could not find element name for slides for ', url);
     return;
@@ -66,17 +67,16 @@ function addSlideData(slideElement){
   var aside = slideElement.querySelector('aside');
   if (aside && aside.textContent.trim() !== ''){
     slide.aside = getText(aside);
-    slide.text += slide.aside;
   }
 
   var images = slideElement.querySelectorAll('img');
-  if (images.length){
+  if (images.length > 0){
     slide.images = [];
     for (var i = 0; i != images.length; ++i){
       var image = images[i];
       var alt = image.alt || image.title;
       if (alt && alt.trim() != ''){
-        slide.text += image.alt;
+        slide.text += alt;
         slide.images.push({alt: alt, src: image.src});
       }
     }
@@ -105,9 +105,10 @@ document.body.onclick = function(e){
 }
 
 findInput.onkeydown = function(e){
-  matches = [];
   if (e.keyCode === 13) {
     find();
+  } else {
+    matches = [];
   }
 }
 
@@ -115,40 +116,48 @@ findButton.onclick = find;
 
 function find(){
   if (matches.length === 0) {
-    queryString = findInput.value.replace(/[^a-zA-Z()_.=<>]/g, " ").toLowerCase();
+    currentMatchIndex = 0;
+    // to be secure might want alphanumeric only
+    queryString = findInput.value.replace(/[^a-zA-Z0-9()_.=<>]/g, " ").toLowerCase();
     numResults = 0;
     numSlides = 0;
     searchResultsString = '';
     for (var i = 0; i !== slides.length; ++i) {
       if (slides[i].text.indexOf(queryString) !== -1) {
-        matches.push(i);
+        matches.push({slideIndex: i, type: 'text'});
+      }
+      // for matches in presenter notes
+      if (slides[i].aside && slides[i].aside.indexOf(queryString) !== -1) {
+        matches.push({slideIndex: i, type: 'aside'});
       }
     }
   }
   if (matches.length > 0) {
+    highlight(queryString);
     displayNextMatch();
   }
 };
 
 function displayNextMatch(){
-  var slideIndex = matches[currentMatchIndex];
+  console.log(matches);
+  var slideIndex = matches[currentMatchIndex].slideIndex;
+  console.log(slideIndex);
   slidedeck.setCurrentSlide(slideIndex);
-  var aside = slides[slideIndex].aside;
-  console.log('aside', aside);
-  if (aside && aside.indexOf(queryString) !== -1) {
-    console.log('show aside');
+  // if this match is in presenter notes
+  if (matches[currentMatchIndex].type === 'aside') {
     document.body.classList.add('with-notes');
+  } else {
+    document.body.classList.remove('with-notes');
   }
+  // increment matchIndex
   currentMatchIndex = (currentMatchIndex + 1) % matches.length;
-  highlight(queryString);
 }
 
 function highlight(text){
-  console.log('highlighting ', text);
-  var slides = document.getElementsByTagName('slide');
-  for (var i = 0; i != slides.length; ++i) {
+  for (var i = 0; i != slideElements.length; ++i) {
     var re = new RegExp('(' + text + ')', 'gi');
-    slides[i].innerHTML =
-      slides[i].innerHTML.replace(re, '<mark>\$1</mark>');
+    slideElements[i].innerHTML =
+      slideElements[i].innerHTML.replace(re, '<mark>\$1</mark>');
+    // highlight images with matching alt text
   }
 }
