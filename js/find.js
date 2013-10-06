@@ -1,17 +1,18 @@
 // add autocomplete
 // match find box and behaviour
-// datalist using var words = document.body.textContent.split(/\s+/).sort().filter( function(v,i,o){return v!==o[i-1];});
-// h3manth.com/content/javascript-one-liner-extracting-unique-words-webpages
+// datalist using var words = allText.split(/\s+/).sort().filter( function(v,i,o){return v!==o[i-1];});
 
 
 // edited index.html (for elements), sam.css (for find elements), slides.js (to add find.js), slide-deck.js (add case for F; setCurrentSlide())
 
+var allText;
 var currentMatchIndex = 0;
 var matches = [];
 var slides = [];
 var queryString;
 var slideElements;
 
+var datalist = document.querySelector('div#find datalist');
 var findButton = document.querySelector('div#find button');
 var findDiv = document.querySelector('div#find');
 var findInput = document.querySelector('div#find input');
@@ -24,13 +25,13 @@ function getSlideData(){
   var d =  window.document;
   slideElements = d.querySelectorAll('slide') || d.querySelector('article') || d.querySelector('section');
   if (!slideElements) {
-    console.log('Could not find element name for slides for ', url);
+    console.log('Could not find element name: not slide, article or section.');
     return;
   }
   for (var i = 0; i !== slideElements.length; ++i){
     addSlideData(slideElements[i]);
   }
-  // console.log('slides', slides.length, slides);
+  buildDataList();
 }
 
 // each slide may have a heading, article, aside (speaker notes) and images
@@ -55,13 +56,13 @@ function addSlideData(slideElement){
   }
 
   if (slide.heading) {
-    slide.text += slide.heading;
+    slide.text += slide.heading + ' ';
   }
 
   var article = slideElement.querySelector('article');
   if (article && article.textContent.trim() !== ''){
     slide.article = getText(article);
-    slide.text += slide.article;
+    slide.text += slide.article + ' ';
   }
 
   var aside = slideElement.querySelector('aside');
@@ -76,7 +77,7 @@ function addSlideData(slideElement){
       var image = images[i];
       var alt = image.alt || image.title;
       if (alt && alt.trim() != ''){
-        slide.text += alt;
+        slide.text += alt + ' ';
         slide.images.push({alt: alt, src: image.src});
       }
     }
@@ -87,12 +88,24 @@ function addSlideData(slideElement){
   }
 
   slides.push(slide);
+  allText += slide.text + ' ';
+}
+
+function buildDataList() {
+  // chapeau! h3manth.com/content/javascript-one-liner-extracting-unique-words-webpages
+  var terms = allText.split(/[^a-zA-Z0-9]/).sort().filter(function(value, index, array){
+    return value !== array[index - 1] && value.length > 2;
+  });
+  for (var i = 0; i != terms.length; ++i) {
+    var option = document.createElement('option');
+    option.value = terms[i];
+    datalist.appendChild(option);
+  }
 }
 
 
-
 function getText(element){
-  return element.textContent.trim().replace(/\s+/g, ' ').toLowerCase();
+  return element.textContent.trim().replace(/\s+/g, ' ');
 }
 
 // handle click if in findDiv, otherwise hide findDiv
@@ -118,16 +131,17 @@ function find(){
   if (matches.length === 0) {
     currentMatchIndex = 0;
     // to be secure might want alphanumeric only
-    queryString = findInput.value.replace(/[^a-zA-Z0-9()_.=<>]/g, " ").toLowerCase();
+    queryString = findInput.value.replace(/[^a-zA-Z0-9()_\.=<>+:-]/g, " ").toLowerCase();
     numResults = 0;
     numSlides = 0;
     searchResultsString = '';
     for (var i = 0; i !== slides.length; ++i) {
-      if (slides[i].text.indexOf(queryString) !== -1) {
+      if (slides[i].text.toLowerCase().indexOf(queryString) !== -1) {
         matches.push({slideIndex: i, type: 'text'});
       }
       // for matches in presenter notes
-      if (slides[i].aside && slides[i].aside.indexOf(queryString) !== -1) {
+      if (slides[i].aside &&
+          slides[i].aside.toLowerCase().indexOf(queryString) !== -1) {
         matches.push({slideIndex: i, type: 'aside'});
       }
     }
