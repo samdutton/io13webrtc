@@ -11,13 +11,28 @@ var matches = [];
 var slides = [];
 var queryString;
 var slideElements;
+var textNodes = [];
 
 var datalist = document.querySelector('div#find datalist');
 var findButton = document.querySelector('div#find button');
 var findDiv = document.querySelector('div#find');
 var findInput = document.querySelector('div#find input');
+// findInput.oninput = find;
 
+getTextNodes(document.body);
 getSlideData();
+console.log(textNodes);
+
+function getTextNodes(node) {
+  if (node && node.childNodes.length > 0)
+    for (var i = 0; i !== node.childNodes.length; ++i) {
+      var childNode = node.childNodes[i];
+      if (childNode.nodeType === Node.TEXT_NODE && childNode.nodeValue.trim() != '') {
+        textNodes.push(childNode);
+      }
+      getTextNodes(childNode);
+    }
+}
 
 function getSlideData(){
   // cope with different document formats
@@ -128,6 +143,7 @@ findInput.onkeydown = function(e){
 findButton.onclick = find;
 
 function find(){
+  console.log('find');
   if (matches.length === 0) {
     currentMatchIndex = 0;
     // to be secure might want alphanumeric only
@@ -153,7 +169,6 @@ function find(){
 };
 
 function displayNextMatch(){
-  console.log(matches);
   var slideIndex = matches[currentMatchIndex].slideIndex;
   console.log(slideIndex);
   slidedeck.setCurrentSlide(slideIndex);
@@ -168,10 +183,8 @@ function displayNextMatch(){
 }
 
 function highlight(text){
-  for (var i = 0; i != slideElements.length; ++i) {
-    var re = new RegExp('(' + text + ')', 'gi');
-    slideElements[i].innerHTML =
-      slideElements[i].innerHTML.replace(re, '<mark>\$1</mark>');
-    // highlight images with matching alt text
-  }
+  // var re = new RegExp('(' + text + ')', 'gi');
+  // slideElements[i].innerHTML =
+  //   slideElements[i].innerHTML.replace(re, '<mark>\$1</mark>');
+  // // highlight images with matching alt text
 }

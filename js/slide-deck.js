@@ -543,7 +543,6 @@ SlideDeck.prototype.setCurrentSlide = function(slideIndex, opt_dontPush) {
 };
 
 window.onhashchange = function(){
-  console.log('hashchange');
   var slideIndex = location.hash.split('#')[1] - 1;
   if (slideIndex >= 0 && slideIndex < slides.length) {
     slidedeck.setCurrentSlide(slideIndex);
